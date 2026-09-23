@@ -225,7 +225,7 @@
   </div>
   <div class="wrap">
     <div class="video-frame">
-      <video src="./aihil-demo.mp4" poster="./aihil-demo-poster.jpg" controls autoplay muted loop playsinline preload="metadata"></video>
+      <video src="./aihil-demo.mp4" poster="./aihil-demo-poster.jpg" controls playsinline preload="metadata"></video>
     </div>
   </div>
 </section>
@@ -458,7 +458,9 @@
         <h3>Join the beta waitlist</h3>
         <p class="intro">Tell us a bit about your work so we can prioritize the first batch.</p>
         <!-- WIRE THIS FORM TO YOUR BACKEND: set action/method, or connect to Mailchimp / ConvertKit / Formspree / Google Forms. Currently front-end only. -->
-        <form id="waitForm" novalidate>
+        <form id="waitForm" action="https://formspree.io/f/YOUR_FORM_ID" method="POST" novalidate>
+          <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" style="display:none" aria-hidden="true" />
+          <input type="hidden" name="_subject" value="New AI HIL beta signup" />
           <div class="field"><label>Name *</label><input type="text" name="name" required autocomplete="name" /></div>
           <div class="field"><label>Best contact email *</label><input type="email" name="email" required autocomplete="email" placeholder="you@example.com" /></div>
           <div class="field"><label>Phone number <span class="opt">(optional)</span></label><input type="tel" name="phone" autocomplete="tel" placeholder="Include country code" /></div>
@@ -548,11 +550,12 @@
     document.getElementById('priceOther').style.display = this.value==='other' ? 'block' : 'none';
   });
   // Front-end only. Replace this handler with a real submit to your backend / form service.
-  document.getElementById('waitForm').addEventListener('submit',function(e){
+  document.getElementById('waitForm').addEventListener('submit',async function(e){
     e.preventDefault();
-    var name=this.querySelector('[name=name]');
-    var email=this.querySelector('[name=email]');
-    var feedback=this.querySelector('[name=feedback]');
+    var form=this;
+    var name=form.querySelector('[name=name]');
+    var email=form.querySelector('[name=email]');
+    var feedback=form.querySelector('[name=feedback]');
     function mark(el,bad){el.style.borderColor = bad ? 'var(--red)' : 'var(--border)';}
     var emailOk=/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.value.trim());
     var nameOk=name.value.trim().length>0;
@@ -561,8 +564,14 @@
     if(!nameOk){name.focus();return;}
     if(!emailOk){email.focus();return;}
     if(!fbOk){feedback.focus();return;}
-    // const data=Object.fromEntries(new FormData(this));  // <-- send this to your service
-    document.getElementById('join').classList.add('done');
+    var done=function(){document.getElementById('join').classList.add('done');};
+    // Preview mode: until you paste your real form endpoint, just show the thank-you.
+    if(form.action.indexOf('YOUR_FORM_ID')>-1){done();return;}
+    var btn=form.querySelector('button[type=submit]'); var label=btn.textContent; btn.textContent='Sending…'; btn.disabled=true;
+    try{
+      var res=await fetch(form.action,{method:'POST',body:new FormData(form),headers:{'Accept':'application/json'}});
+      if(res.ok){done();}else{btn.textContent=label;btn.disabled=false;alert('Sorry, something went wrong. Please try again, or email us directly.');}
+    }catch(err){btn.textContent=label;btn.disabled=false;alert('Network error — please try again.');}
   });
 </script>
 </body>
