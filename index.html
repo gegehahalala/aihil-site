@@ -428,8 +428,8 @@
     </div>
 
     <div style="text-align:center;margin-top:36px">
-      <a href="mailto:teams@getaihil.com?subject=AI%20HIL%20for%20teams" class="btn btn-gold btn-lg">Talk to us about team access</a>
-      <p style="color:var(--muted-2);font-size:14px;margin-top:12px">Custom pilots and volume options for embedded teams.</p>
+      <a href="#join" class="btn btn-gold btn-lg">Talk to us about team access</a>
+      <p style="color:var(--muted-2);font-size:14px;margin-top:12px">Custom pilots and volume options for embedded teams &middot; or email <a href="mailto:info@getaihil.com" style="color:var(--gold)">info@getaihil.com</a></p>
     </div>
   </div>
 </section>
@@ -458,9 +458,11 @@
         <h3>Join the beta waitlist</h3>
         <p class="intro">Tell us a bit about your work so we can prioritize the first batch.</p>
         <!-- WIRE THIS FORM TO YOUR BACKEND: set action/method, or connect to Mailchimp / ConvertKit / Formspree / Google Forms. Currently front-end only. -->
-        <form id="waitForm" action="https://formspree.io/f/YOUR_FORM_ID" method="POST" novalidate>
-          <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" style="display:none" aria-hidden="true" />
-          <input type="hidden" name="_subject" value="New AI HIL beta signup" />
+        <form id="waitForm" action="https://api.web3forms.com/submit" method="POST" novalidate>
+          <input type="hidden" name="access_key" value="1e0e66e6-ef6f-49c3-82e1-4ccccac0e7f2" />
+          <input type="hidden" name="subject" value="New AI HIL beta signup" />
+          <input type="hidden" name="from_name" value="AI HIL Website" />
+          <input type="checkbox" name="botcheck" tabindex="-1" style="display:none" aria-hidden="true" />
           <div class="field"><label>Name *</label><input type="text" name="name" required autocomplete="name" /></div>
           <div class="field"><label>Best contact email *</label><input type="email" name="email" required autocomplete="email" placeholder="you@example.com" /></div>
           <div class="field"><label>Phone number <span class="opt">(optional)</span></label><input type="tel" name="phone" autocomplete="tel" placeholder="Include country code" /></div>
@@ -565,8 +567,9 @@
     if(!emailOk){email.focus();return;}
     if(!fbOk){feedback.focus();return;}
     var done=function(){document.getElementById('join').classList.add('done');};
-    // Preview mode: until you paste your real form endpoint, just show the thank-you.
-    if(form.action.indexOf('YOUR_FORM_ID')>-1){done();return;}
+    // Preview mode: until you paste your real access key, just show the thank-you.
+    var ak=form.querySelector('[name=access_key]');
+    if(ak && ak.value.indexOf('YOUR_ACCESS_KEY')>-1){done();return;}
     var btn=form.querySelector('button[type=submit]'); var label=btn.textContent; btn.textContent='Sending…'; btn.disabled=true;
     try{
       var res=await fetch(form.action,{method:'POST',body:new FormData(form),headers:{'Accept':'application/json'}});
