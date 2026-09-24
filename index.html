@@ -466,9 +466,10 @@
           <div class="field"><label>Name *</label><input type="text" name="name" required autocomplete="name" /></div>
           <div class="field"><label>Best contact email *</label><input type="email" name="email" required autocomplete="email" placeholder="you@example.com" /></div>
           <div class="field"><label>Phone number <span class="opt">(optional)</span></label><input type="tel" name="phone" autocomplete="tel" placeholder="Include country code" /></div>
-          <div class="field"><label>What chips / boards do you work with? <span class="opt">(optional)</span></label><input type="text" name="hardware" placeholder="e.g. STM32, ESP32, nRF, RP2040" /></div>
-          <div class="field"><label>What best describes you? <span class="opt">(optional)</span></label>
-            <select name="role">
+          <div class="field"><label>Company / organization <span class="opt">(optional)</span></label><input type="text" name="company" autocomplete="organization" placeholder="Where you work (if applicable)" /></div>
+          <div class="field"><label>What chips / boards do you work with? *</label><input type="text" name="hardware" required placeholder="e.g. STM32, ESP32, nRF, RP2040" /></div>
+          <div class="field"><label>What best describes you? *</label>
+            <select name="role" required>
               <option value="">Select one&hellip;</option>
               <option>Firmware / embedded engineer</option>
               <option>Robotics</option>
@@ -480,6 +481,8 @@
               <option>Other</option>
             </select>
           </div>
+          <div class="field"><label>Which AI agent / tools do you use? <span class="opt">(optional)</span></label><input type="text" name="ai_tools" placeholder="e.g. Claude, Cursor, GLM, Copilot" /></div>
+          <div class="field"><label>Country / region <span class="opt">(optional)</span></label><input type="text" name="country" autocomplete="country-name" placeholder="e.g. United States" /></div>
           <div class="field"><label>Would you pay for the beta? If so, how much? <span class="opt">(optional)</span></label>
             <select name="price" id="priceSel">
               <option value="">Select an amount&hellip;</option>
@@ -490,9 +493,22 @@
             </select>
             <input type="text" name="price_other" id="priceOther" placeholder="Enter the amount you&rsquo;d pay" style="display:none;margin-top:10px" />
           </div>
+          <div class="field"><label>How did you hear about us? <span class="opt">(optional)</span></label>
+            <select name="referral">
+              <option value="">Select one&hellip;</option>
+              <option>LinkedIn</option>
+              <option>X / Twitter</option>
+              <option>YouTube</option>
+              <option>Reddit</option>
+              <option>Search engine</option>
+              <option>Friend / colleague</option>
+              <option>Other</option>
+            </select>
+          </div>
           <div class="field"><label>What features would you expect &mdash; and any thoughts, feedback, or concerns? *</label>
             <textarea name="feedback" required placeholder="This is the most helpful part for us &mdash; tell us what would make AI HIL a must-have for you, what&rsquo;s missing, or any concerns."></textarea>
           </div>
+          <label class="consent" style="display:flex;align-items:flex-start;gap:10px;font-size:14px;color:var(--muted);margin-bottom:16px;cursor:pointer"><input type="checkbox" name="consent" value="yes" style="width:auto;margin-top:3px;accent-color:var(--gold)" /> <span>I agree to be contacted about the AI HIL beta. *</span></label>
           <button type="submit" class="btn btn-gold btn-lg">Join the beta waitlist</button>
           <p class="fine">We&rsquo;ll only contact you about the beta. Opt out anytime.</p>
         </form>
@@ -557,15 +573,23 @@
     var form=this;
     var name=form.querySelector('[name=name]');
     var email=form.querySelector('[name=email]');
+    var hardware=form.querySelector('[name=hardware]');
+    var role=form.querySelector('[name=role]');
     var feedback=form.querySelector('[name=feedback]');
     function mark(el,bad){el.style.borderColor = bad ? 'var(--red)' : 'var(--border)';}
     var emailOk=/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.value.trim());
     var nameOk=name.value.trim().length>0;
+    var hwOk=hardware.value.trim().length>0;
+    var roleOk=role.value.trim().length>0;
     var fbOk=feedback.value.trim().length>0;
-    mark(name,!nameOk); mark(email,!emailOk); mark(feedback,!fbOk);
+    mark(name,!nameOk); mark(email,!emailOk); mark(hardware,!hwOk); mark(role,!roleOk); mark(feedback,!fbOk);
     if(!nameOk){name.focus();return;}
     if(!emailOk){email.focus();return;}
+    if(!hwOk){hardware.focus();return;}
+    if(!roleOk){role.focus();return;}
     if(!fbOk){feedback.focus();return;}
+    var consent=form.querySelector('[name=consent]');
+    if(consent && !consent.checked){var cl=consent.closest('.consent'); if(cl){cl.style.color='var(--red)';} consent.focus(); return;}
     var done=function(){document.getElementById('join').classList.add('done');};
     // Preview mode: until you paste your real access key, just show the thank-you.
     var ak=form.querySelector('[name=access_key]');
